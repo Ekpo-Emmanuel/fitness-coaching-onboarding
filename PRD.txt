@@ -1,0 +1,1190 @@
+I am currently building my custom fitness coaching CRM, but it is NOT ready for client onboarding yet.
+
+For now, build a **standalone Client Onboarding web application using Next.js**, with **Google Sheets as the temporary database/data store**.
+
+This is NOT a Google Form.
+
+The client-facing experience must be a custom-built, premium Next.js application.
+
+The system should work immediately while my full CRM is still being developed, but the architecture and field naming should make eventual migration into the CRM straightforward.
+
+# REQUIRED TECH STACK
+
+Use:
+
+* **Next.js**
+* TypeScript
+* Modern responsive CSS/UI system (tailwind css)
+* Google Sheets as the temporary database
+* Google Sheets API for server-side reads/writes
+* Environment variables for credentials/configuration
+* Vercel-compatible deployment architecture
+
+Do NOT use:
+
+* Google Forms
+* Airtable
+* Typeform
+* Supabase
+* Firebase
+* Convex
+* Prisma/database infrastructure
+* A paid form SaaS
+
+The architecture should be:
+
+Client
+→ Next.js onboarding UI
+→ Next.js server/API layer
+→ Google Sheets API
+→ Google Sheets database
+
+Never expose Google Sheets credentials or private API credentials to the browser.
+
+All Google Sheets communication must happen server-side.
+
+---
+
+# CONTEXT
+
+This is NOT a sales application.
+
+The client has already:
+
+Applied / spoken with me
+→ Been accepted for coaching
+→ Reviewed the coaching offer
+→ Signed the coaching agreement
+→ Paid
+
+This form happens AFTER payment.
+
+Its purpose is to collect everything I need to safely and intelligently begin coaching the client and create their training, nutrition and starting plan.
+
+My current manual workflow is:
+
+Client signs agreement
+→ Client pays through Stripe
+→ I personally send welcome voice memo
+→ I send onboarding link
+→ Client submits onboarding
+→ Submission is saved to Google Sheets
+→ I review their client summary
+→ I create baseline
+→ I build training program
+→ I establish nutrition targets
+→ Coaching begins
+→ Weekly check-ins begin
+
+Do not attempt to automate the entire coaching workflow.
+
+---
+
+# PRIMARY GOAL
+
+Build a polished, mobile-first fitness coaching onboarding experience that feels:
+
+* Clean
+* Premium
+* Personal
+* Simple
+* Modern
+* Easy to understand
+* Easy to navigate
+* Fast to complete
+* Not intimidating
+* Not overly clinical
+* Nothing like a generic Google Form
+
+The client should feel:
+
+“I've officially joined Emmanuel's coaching and this is the beginning of my program.”
+
+NOT:
+
+“I've been sent another administrative form.”
+
+Target completion time:
+
+**8–12 minutes**
+
+---
+
+# CLIENT EXPERIENCE
+
+Create a custom multi-step Next.js onboarding flow.
+
+Suggested flow:
+
+Welcome
+→ About You
+→ Health
+→ Training
+→ Schedule
+→ Goals
+→ Nutrition
+→ Lifestyle
+→ Progress
+→ Coaching
+→ Final Check
+→ Success
+
+Do not display dozens of questions on one page.
+
+Use:
+
+* Large mobile-friendly inputs
+* Clear typography
+* Generous whitespace
+* Progress indicator
+* Back / Continue navigation
+* Conditional questions
+* Multi-select controls
+* Radio/select controls where appropriate
+* Helpful descriptions
+* Clear validation
+* Inline error states
+* Autosave locally where practical
+* Smooth transitions without excessive animation
+
+Optimize primarily for someone completing the onboarding on an iPhone.
+
+If the page refreshes accidentally, preserve their progress locally where reasonably possible.
+
+Do not save incomplete health information to Google Sheets unless the user actually submits the form.
+
+---
+
+# SCREEN 1 — WELCOME
+
+Headline:
+
+**Welcome to Coaching**
+
+Supporting copy:
+
+“You're officially in. Before I build your training and nutrition plan, I need to learn a little more about your body, routine, training environment and lifestyle.
+
+Your answers will help me build your coaching around you rather than giving you a generic program.”
+
+Show:
+
+**Takes approximately 8–12 minutes**
+
+Small reassurance:
+
+“Take your time and answer as accurately as you can. There are no perfect answers.”
+
+CTA:
+
+**Start Onboarding**
+
+---
+
+# SECTION 1 — ABOUT YOU
+
+Collect:
+
+* Full name — required
+* Email — required
+* Phone / WhatsApp — required
+* Date of birth — required
+* Sex — include Prefer not to say
+* Height — value + ft/in or cm
+* Current bodyweight — value + lb or kg
+* Occupation
+* Normal workday activity:
+
+  * Mostly sitting
+  * Mix of sitting and walking
+  * Mostly standing
+  * Physically active
+  * Very physically demanding
+* Approximate daily steps:
+
+  * Under 3,000
+  * 3,000–5,000
+  * 5,000–8,000
+  * 8,000–10,000
+  * 10,000+
+  * I don't know
+
+---
+
+# SECTION 2 — HEALTH & SAFETY
+
+Introduction:
+
+“This helps me make better training decisions. Please answer honestly. If you're unsure about anything, we can discuss it privately.”
+
+Ask:
+
+### Current injuries, pain or physical limitations?
+
+Yes / No
+
+If Yes:
+
+“Please tell me what you're experiencing and anything that makes it better or worse.”
+
+### Significant previous injuries?
+
+Yes / No
+
+If Yes → details.
+
+### Significant surgeries?
+
+Yes / No
+
+If Yes → details.
+
+### Has a doctor or healthcare professional ever told you to limit or modify exercise?
+
+Yes / No
+
+If Yes → details.
+
+### Medical conditions that could affect exercise or nutrition?
+
+Yes / No / Unsure
+
+If Yes or Unsure → details.
+
+### Medications that may affect exercise, appetite, heart rate, blood pressure, recovery or bodyweight?
+
+* No
+* Yes
+* Prefer to discuss privately
+
+If Yes → optional details.
+
+### Pregnancy/postpartum consideration
+
+Where applicable:
+
+“Are you currently pregnant, recently postpartum, or aware of any pregnancy-related considerations that may affect training?”
+
+* No
+* Yes
+* Not applicable
+* Prefer to discuss privately
+
+### Anything else about your health I should know before creating your program?
+
+Optional long answer.
+
+Required acknowledgement:
+
+“I understand that I should consult an appropriate healthcare professional if I have concerns about whether exercise is appropriate for me.”
+
+Do NOT make medical diagnoses.
+
+---
+
+# SECTION 3 — TRAINING BACKGROUND
+
+Ask:
+
+### How long have you been strength training consistently?
+
+* Never
+* Less than 3 months
+* 3–6 months
+* 6–12 months
+* 1–2 years
+* 2+ years
+
+### How many days per week are you currently training?
+
+0–7.
+
+### What does your current training normally look like?
+
+Long answer.
+
+Helper:
+
+“You can describe your usual workouts, split, classes, cardio, etc.”
+
+### Have you followed a structured workout program before?
+
+Yes / No
+
+### Which exercises do you feel confident performing?
+
+Long answer.
+
+### Which exercises do you struggle with or feel unsure about?
+
+Long answer.
+
+### Exercises you dislike or prefer not to do?
+
+Optional.
+
+### Exercises you really enjoy?
+
+Optional.
+
+---
+
+# SECTION 4 — TRAINING LOGISTICS
+
+### How many days per week can you REALISTICALLY train?
+
+* 2
+* 3
+* 4
+* 5
+* 6
+
+Emphasize **realistically**.
+
+### Which days are usually available?
+
+Multi-select Monday–Sunday.
+
+### Realistic workout duration?
+
+* 30–45 minutes
+* 45–60 minutes
+* 60–75 minutes
+* 75–90 minutes
+* 90+ minutes
+
+### Where will you normally train?
+
+* Commercial gym
+* Apartment gym
+* Home gym
+* Home with limited equipment
+* Other
+
+### What gym do you use?
+
+Optional.
+
+### Equipment access
+
+Multi-select:
+
+* Barbells
+* Dumbbells
+* Squat rack
+* Smith machine
+* Cable machines
+* Leg press
+* Hack squat
+* Selectorized machines
+* Cardio equipment
+* Resistance bands
+* Other
+* I don't know / I'm not sure
+
+For applicable hybrid clients:
+
+### Where would you prefer our in-person sessions to take place?
+
+Optional.
+
+---
+
+# SECTION 5 — GOALS
+
+Do NOT turn this into another sales application.
+
+### What is your #1 fitness priority right now?
+
+Long answer.
+
+### What other results would you like to work toward?
+
+Multi-select:
+
+* Build muscle
+* Build strength
+* Lose body fat
+* Improve muscle definition
+* Grow glutes
+* Grow legs/quads
+* Improve upper-body development
+* Improve conditioning
+* Improve confidence in the gym
+* Improve general health
+* Other
+
+### Has anything about your goals changed since we last spoke?
+
+No / Yes
+
+If Yes:
+
+“What changed?”
+
+Do NOT ask deeper identity/transformation sales questions.
+
+Those belong in personal coaching conversations.
+
+---
+
+# SECTION 6 — NUTRITION
+
+Introduction:
+
+“I'm not looking for perfect eating. I just need an honest picture of what your nutrition currently looks like.”
+
+Ask:
+
+### Current eating structure
+
+* Very structured
+* Somewhat structured
+* Inconsistent
+* Mostly whatever is convenient
+* I'm not sure
+
+### Meals per day
+
+### Walk me through a normal day of eating.
+
+Design this cleanly.
+
+Capture breakfast, lunch, dinner, snacks and drinks either through individual fields or a clean structured interface.
+
+### Currently tracking calories or macros?
+
+Yes / No
+
+If Yes:
+
+Optional:
+
+* Calories
+* Protein
+* Carbohydrates
+* Fat
+
+### Food allergies or intolerances?
+
+Yes / No
+
+If Yes → details.
+
+### Dietary restrictions/eating style
+
+* None
+* Vegetarian
+* Vegan
+* Halal
+* Gluten-free
+* Dairy-free
+* Other
+
+### Foods you really enjoy
+
+### Foods you dislike or won't eat
+
+### Restaurant/takeout frequency
+
+* Rarely
+* 1–2 times/week
+* 3–4 times/week
+* 5+ times/week
+
+### Approximate water intake
+
+### Alcohol frequency
+
+* Never
+* Occasionally
+* Weekly
+* Multiple times per week
+
+### Have you intentionally tried to lose or gain weight before?
+
+Yes / No
+
+If Yes:
+
+“What did you try, and how did it go?”
+
+Do NOT automatically calculate or prescribe calories/macros.
+
+---
+
+# SECTION 7 — LIFESTYLE & RECOVERY
+
+### Typical sleep
+
+* Under 5 hours
+* 5–6
+* 6–7
+* 7–8
+* 8+
+
+### Sleep quality
+
+1–5
+
+1 = Poor
+5 = Excellent
+
+### Current stress
+
+1–5
+
+1 = Very low
+5 = Very high
+
+### Biggest sources of stress
+
+Optional.
+
+### Work schedule
+
+* Regular daytime hours
+* Variable schedule
+* Night shifts
+* Rotating shifts
+* Other
+
+### Anything about your schedule that could make training consistency difficult?
+
+Optional.
+
+---
+
+# SECTION 8 — PROGRESS TRACKING
+
+Headline:
+
+**How are you comfortable tracking progress?**
+
+Explanation:
+
+“We don't have to rely on one number. We can use different markers to see what's actually improving.”
+
+Multi-select:
+
+* Bodyweight
+* Progress photos
+* Body measurements
+* Strength
+* Workout performance
+* Workout completion
+* Daily steps/activity
+* Nutrition consistency
+
+Ask separately:
+
+### Are you comfortable submitting private progress photos for coaching purposes?
+
+Yes / No
+
+Show:
+
+“Progress photos are private coaching information and will not be posted or used for marketing without separate permission.”
+
+Never combine progress-photo submission with marketing consent.
+
+---
+
+# SECTION 9 — COACHING PREFERENCES
+
+Headline:
+
+**How can I coach you best?**
+
+### Preferred feedback
+
+Multi-select:
+
+* Direct and straightforward
+* Encouraging and supportive
+* Detailed explanations
+* Short and actionable
+* A combination
+
+### When you're struggling with consistency, what usually helps you get back on track?
+
+Long answer.
+
+### What usually causes you to fall off track?
+
+Long answer.
+
+### Is there anything you DON'T want from a coach?
+
+Optional.
+
+### What's the biggest thing you're nervous or uncertain about as we start coaching?
+
+Long answer.
+
+This question is important.
+
+---
+
+# SECTION 10 — FINAL CHECK
+
+Headline:
+
+**Almost done.**
+
+### Is there anything else you want me to know before I build your program?
+
+Optional.
+
+Required acknowledgement:
+
+“I confirm that the information I've provided is accurate to the best of my knowledge.”
+
+CTA:
+
+**Submit Onboarding**
+
+Disable duplicate submission while the request is processing.
+
+Show a clear loading state.
+
+Only show success after Google Sheets confirms the submission was successfully stored.
+
+---
+
+# SUCCESS SCREEN
+
+Headline:
+
+**You're all set 🎉**
+
+Copy:
+
+“I've received your onboarding information.
+
+I'll review everything and use it to prepare your initial training and nutrition setup.
+
+From here, we'll go through your starting plan together and make sure you know exactly what we're doing and why.
+
+Welcome to coaching.”
+
+Do not immediately overwhelm them with additional forms.
+
+---
+
+# GOOGLE SHEETS DATABASE
+
+Google Sheets will act as the temporary database.
+
+Create or configure a workbook specifically for coaching onboarding.
+
+Do NOT dump everything into an unstructured spreadsheet.
+
+Recommended workbook architecture:
+
+## Sheet 1 — CLIENTS
+
+One row per submitted onboarding.
+
+Include important coach-facing fields such as:
+
+* submission_id
+* submitted_at
+* full_name
+* email
+* phone
+* date_of_birth
+* current_weight
+* primary_goal
+* training_experience
+* training_days_available
+* training_location
+* health_flag
+* sleep_duration
+* stress_level
+* feedback_preference
+* onboarding_status
+* coach_notes
+
+## Sheet 2 — ONBOARDING_RESPONSES
+
+Store the complete onboarding dataset.
+
+One row per client submission.
+
+Every question should have a stable machine-readable column key.
+
+Do not use question sentences as database field names.
+
+Examples:
+
+full_name
+email
+phone
+date_of_birth
+sex
+height_value
+height_unit
+weight_value
+weight_unit
+occupation
+activity_level
+average_steps
+current_injuries
+current_injury_details
+previous_injuries
+previous_injury_details
+surgeries
+surgery_details
+exercise_restrictions
+medical_conditions
+medications
+pregnancy_considerations
+health_additional_notes
+training_experience
+current_training_days
+current_training_description
+structured_program_experience
+confident_exercises
+uncertain_exercises
+disliked_exercises
+preferred_exercises
+training_days_available
+available_days
+session_duration
+training_location
+gym_name
+equipment_access
+primary_goal
+secondary_goals
+goal_changes
+current_eating
+meals_per_day
+typical_breakfast
+typical_lunch
+typical_dinner
+typical_snacks
+typical_drinks
+calorie_tracking
+current_calories
+current_protein
+current_carbs
+current_fat
+food_allergies
+dietary_restrictions
+preferred_foods
+disliked_foods
+takeout_frequency
+water_intake
+alcohol_frequency
+weight_change_history
+sleep_duration
+sleep_quality
+stress_level
+stress_sources
+work_schedule
+schedule_challenges
+progress_methods
+progress_photos
+feedback_preference
+consistency_challenges
+fall_off_causes
+coaching_dislikes
+coaching_concerns
+additional_notes
+
+Include:
+
+submission_id
+submitted_at
+schema_version
+
+## Sheet 3 — FIELD_MAP
+
+Document:
+
+* field_key
+* client_label
+* section
+* data_type
+* required
+* possible_values
+* CRM_destination
+* notes
+
+This will make future CRM migration significantly easier.
+
+---
+
+# DATA HANDLING
+
+Create a server-side service/module specifically for Google Sheets.
+
+The React components should NOT know how Google Sheets works.
+
+For example:
+
+UI
+→ onboarding submission service
+→ repository/data layer
+→ Google Sheets
+
+Keep the storage implementation separated enough that Google Sheets can later be replaced with the CRM database without rebuilding the onboarding UI.
+
+Create a normalized TypeScript type/schema for the onboarding submission.
+
+Validate submissions server-side before writing them.
+
+Reject:
+
+* Missing required fields
+* Invalid email
+* Invalid enum values
+* Impossible numeric values
+* Malformed multi-select arrays
+* Invalid acknowledgement state
+* Unexpected fields where appropriate
+
+Do not trust client-side validation alone.
+
+Generate a unique `submission_id` for every successful onboarding.
+
+Add a `schema_version` such as:
+
+`onboarding_v1`
+
+This is important because the form may evolve over time.
+
+Store timestamps server-side.
+
+---
+
+# MULTI-SELECT STORAGE
+
+Do not create messy human-readable values that will be difficult to migrate later.
+
+Normalize arrays consistently.
+
+For Google Sheets, use a predictable serialized format such as JSON arrays.
+
+Example:
+
+["Monday","Wednesday","Friday"]
+
+instead of:
+
+Monday, Wednesday & Friday
+
+The same principle applies to:
+
+* equipment_access
+* secondary_goals
+* progress_methods
+* feedback_preference
+* available_days
+
+---
+
+# HEALTH FLAGS
+
+Create simple deterministic flags for coach review.
+
+Do NOT diagnose anything.
+
+If the client reports things such as:
+
+* Current injury/pain
+* Exercise restriction from healthcare professional
+* Relevant medical condition
+* Medication consideration
+* Pregnancy/postpartum consideration
+* Other health concern
+
+Set:
+
+`coach_review_needed = TRUE`
+
+and:
+
+`health_flag = "Coach Review Needed"`
+
+Optionally store the reasons separately.
+
+The interface should clearly communicate that this is a review flag, NOT a medical assessment.
+
+---
+
+# COACH-FACING VIEW
+
+In addition to Google Sheets, create a simple protected Next.js coach view.
+
+Example route:
+
+`/coach/onboarding`
+
+This should NOT become another full CRM.
+
+Its purpose is simply to make submitted onboarding information much easier to review than opening a raw spreadsheet.
+
+Display a list of submitted clients.
+
+For each client show:
+
+* Name
+* Submission date
+* Primary goal
+* Health review status
+* Training days
+* Current weight
+* Onboarding status
+
+Allow opening a client summary.
+
+Example:
+
+`/coach/onboarding/[submissionId]`
+
+Display:
+
+## ABOUT
+
+Name
+Age
+Height
+Weight
+Occupation
+
+## GOALS
+
+Primary goal
+Secondary goals
+
+## TRAINING
+
+Experience
+Days available
+Available days
+Session duration
+Gym
+Equipment
+
+## HEALTH
+
+Current injuries
+Previous injuries
+Medical considerations
+Medications
+Exercise restrictions
+
+Highlight health information requiring attention with:
+
+**Coach Review Needed**
+
+Do not make medical judgments.
+
+## NUTRITION
+
+Current eating
+Current tracking
+Restrictions
+Typical diet
+
+## RECOVERY
+
+Sleep
+Stress
+Work schedule
+
+## COACHING
+
+Feedback preference
+Consistency challenges
+Biggest concern
+
+## PROGRESS
+
+Selected tracking methods
+
+## COACH NOTES
+
+Provide a simple notes area if it can be implemented safely with Google Sheets.
+
+Do not overbuild this interface.
+
+It is an interim coach review tool, not the CRM.
+
+---
+
+# SECURITY
+
+Because this contains private client and health-related information, do not treat Google Sheets like a public database.
+
+Requirements:
+
+* Google credentials must remain server-side.
+* Do not expose Sheet IDs unnecessarily in the browser.
+* Do not make the spreadsheet publicly editable.
+* Do not make the spreadsheet publicly viewable.
+* Sanitize and validate submissions.
+* Do not log sensitive form answers unnecessarily.
+* Protect coach-facing routes.
+* Never put service-account credentials into client-side `NEXT_PUBLIC_*` variables.
+* Use `.env.local` for local configuration and deployment environment variables in production.
+* Ensure `.env.local` is gitignored.
+
+If authentication for the temporary coach dashboard would substantially complicate the build, prioritize protecting the route with the simplest secure solution rather than building a full user/account system.
+
+---
+
+# DESIGN DIRECTION
+
+The experience should feel like a modern premium online coaching product.
+
+Avoid:
+
+* Generic dashboard styling
+* Huge walls of text
+* Tiny fields
+* Excessive borders
+* Clinical medical-form appearance
+* Generic Google Form appearance
+* Excessive gradients
+* Too many questions per screen
+* Decorative graphics with no purpose
+
+Use:
+
+* Strong typography
+* Generous whitespace
+* Clear hierarchy
+* Large touch targets
+* Simple cards
+* Restrained use of accent color
+* Clear progress indication
+* Excellent mobile spacing
+* Helpful validation
+* Smooth interaction feedback
+
+The interface should look intentionally designed, not like an AI-generated SaaS template.
+
+---
+
+# RESPONSIVE REQUIREMENTS
+
+Design mobile-first.
+
+Explicitly test:
+
+375px
+390px
+430px
+768px
+Desktop
+
+The primary target is an iPhone-sized screen.
+
+There should be:
+
+* No horizontal scrolling
+* No clipped inputs
+* No tiny touch targets
+* No broken multi-select controls
+* No overflowing labels
+* No inaccessible Back/Continue controls
+
+---
+
+# FAILURE STATES
+
+Handle real-world failures.
+
+If Google Sheets cannot be reached:
+
+Do NOT tell the client their onboarding was submitted.
+
+Show a friendly message such as:
+
+“We couldn't submit your onboarding just yet. Your answers are still here. Please try again.”
+
+Preserve their answers locally.
+
+Handle:
+
+* API failure
+* Google Sheets failure
+* Network interruption
+* Duplicate clicks
+* Validation failure
+
+Do not silently lose client information.
+
+---
+
+# TESTING
+
+Before calling the project complete, perform a complete test submission as a client.
+
+Test:
+
+* Mobile layout
+* Every step
+* Back/Continue
+* Required fields
+* Conditional fields
+* Multi-select fields
+* Health flag generation
+* Local progress persistence
+* Final submission
+* Google Sheets write
+* CLIENTS summary creation
+* ONBOARDING_RESPONSES write
+* Coach list
+* Coach client detail
+* Error states
+* Duplicate submission protection
+
+Verify the submitted data against the actual Google Sheet.
+
+Fix issues you find.
+
+---
+
+# IMPORTANT IMPLEMENTATION RULE
+
+Do not begin by redesigning the requirements or choosing another platform.
+
+The technology decision has already been made:
+
+**Next.js + Google Sheets.**
+
+First inspect the current development environment and connected Google account/Drive capabilities.
+
+Then produce a short implementation plan.
+
+Then build the system.
+
+If Google authorization or another user-controlled action is required, stop at that exact point and ask me to authorize it rather than replacing Google Sheets with another database.
+
+---
+
+# DELIVERABLES
+
+When complete, give me:
+
+1. Public onboarding URL
+2. Coach review URL
+3. Google Sheet name/location
+4. Explanation of the workbook structure
+5. Complete field mapping
+6. Environment variables/configuration required
+7. Explanation of how Google Sheets authentication works
+8. Screenshot/description of the mobile onboarding experience
+9. Screenshot/description of the coach summary experience
+10. Test submission result
+11. Any limitations of Google Sheets as the temporary database
+12. What will need to change when this is eventually connected to my CRM
+13. Anything I must manually configure before sending the link to my first client
+
+Do NOT send the onboarding form to any real client.
+
+Do NOT publish/share it with a client until I have reviewed and approved the finished version.
