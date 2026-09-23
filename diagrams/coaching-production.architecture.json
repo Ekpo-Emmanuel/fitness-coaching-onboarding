@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Coaching onboarding production architecture",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [1240, 760],
+    "repository": {
+      "url": "https://github.com/Ekpo-Emmanuel/fitness-coaching-onboarding",
+      "provider": "github",
+      "revision": "141d31e0dbe77736a74ff0ec08ad3f3575ee7310"
+    },
+    "views": [
+      {
+        "id": "agent-approve",
+        "label": "Agent then human approval",
+        "focus": ["deepseek", "validation", "agent-changeset", "human-approval", "form-draft"],
+        "note": "Structured operations, deterministic validation, proposed ChangeSet, then human Apply. AI never writes Draft."
+      },
+      {
+        "id": "publish-form",
+        "label": "Draft then publish",
+        "focus": ["form-draft", "form-version", "public-form"],
+        "note": "Mutable Form Draft. Explicit publish. Immutable FormVersion."
+      },
+      {
+        "id": "client-submit",
+        "label": "Canonical submission",
+        "focus": ["public-form", "vercel-next", "neon-postgres"],
+        "note": "Public onboarding uses the Next.js public API. Neon PostgreSQL is the canonical Submission store."
+      },
+      {
+        "id": "downstream",
+        "label": "Review brief integrations",
+        "focus": ["neon-postgres", "review-flags", "coach-brief", "integrations"],
+        "note": "After storage: deterministic Review Flags, source-grounded Coach Brief, then Sheets and signed webhooks."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "deepseek",
+      "type": "external",
+      "label": "DeepSeek",
+      "sublabel": "operations and AI briefs",
+      "brand": "deepseek",
+      "pos": [40, 80],
+      "size": [150, 64],
+      "sources": [{ "path": "lib/ai/config.ts", "line": 19, "label": "model config" }]
+    },
+    {
+      "id": "validation",
+      "type": "backend",
+      "label": "Deterministic validation",
+      "sublabel": "structured operations",
+      "pos": [260, 80],
+      "size": [160, 64],
+      "sources": [{ "path": "lib/agent/service.ts", "line": 129, "label": "validate operations" }]
+    },
+    {
+      "id": "agent-changeset",
+      "type": "backend",
+      "label": "Proposed ChangeSet",
+      "sublabel": "not applied",
+      "pos": [490, 80],
+      "size": [160, 64],
+      "sources": [{ "path": "lib/agent/service.ts", "line": 136, "label": "proposed ChangeSet" }]
+    },
+    {
+      "id": "human-approval",
+      "type": "security",
+      "label": "Human approval",
+      "sublabel": "Apply or Reject",
+      "tag": "coach gate",
+      "pos": [720, 80],
+      "size": [150, 64],
+      "sources": [{ "path": "lib/agent/service.ts", "line": 190, "label": "human apply" }]
+    },
+    {
+      "id": "form-draft",
+      "type": "backend",
+      "label": "Form Draft",
+      "sublabel": "mutable",
+      "pos": [940, 80],
+      "size": [150, 64],
+      "sources": [{ "path": "lib/agent/service.ts", "line": 214, "label": "draft mutation" }]
+    },
+    {
+      "id": "form-version",
+      "type": "backend",
+      "label": "Published FormVersion",
+      "sublabel": "immutable",
+      "pos": [940, 260],
+      "size": [150, 64],
+      "sources": [{ "path": "lib/forms/service.ts", "line": 201, "label": "publish" }]
+    },
+    {
+      "id": "coach-workspace",
+      "type": "frontend",
+      "label": "Coach workspace",
+      "sublabel": "browser · signed in",
+      "pos": [40, 200],
+      "size": [150, 64],
+      "sources": [{ "path": "proxy.ts", "line": 44, "label": "session matcher" }]
+    },
+    {
+      "id": "vercel-next",
+      "type": "cloud",
+      "label": "Next.js application",
+      "sublabel": "public API · coach APIs",
+      "brand": "vercel",
+      "pos": [250, 290],
+      "size": [180, 64],
+      "sources": [{ "path": "app/api/public/forms/[slug]/submit/route.ts", "line": 11, "label": "public submit" }]
+    },
+    {
+      "id": "better-auth",
+      "type": "security",
+      "label": "Better Auth",
+      "sublabel": "session",
+      "pos": [250, 200],
+      "size": [150, 64],
+      "sources": [{ "path": "lib/auth.ts", "line": 15, "label": "session" }]
+    },
+    {
+      "id": "review-flags",
+      "type": "backend",
+      "label": "Review Flags",
+      "sublabel": "deterministic · not AI",
+      "pos": [490, 260],
+      "size": [160, 64],
+      "sources": [{ "path": "lib/submissions/service.ts", "line": 68, "label": "review rules" }]
+    },
+    {
+      "id": "public-form",
+      "type": "frontend",
+      "label": "Public onboarding",
+      "sublabel": "renders published form",
+      "pos": [40, 290],
+      "size": [150, 64],
+      "sources": [{ "path": "app/f/[slug]/PublicForm.tsx", "line": 1, "label": "public renderer" }]
+    },
+    {
+      "id": "neon-postgres",
+      "type": "database",
+      "label": "Neon PostgreSQL",
+      "sublabel": "canonical store",
+      "brand": "neon",
+      "pos": [240, 460],
+      "size": [180, 64],
+      "sources": [{ "path": "lib/db/index.ts", "line": 16, "label": "database" }]
+    },
+    {
+      "id": "coach-brief",
+      "type": "backend",
+      "label": "Coach Brief",
+      "sublabel": "source-grounded AI",
+      "pos": [490, 360],
+      "size": [160, 64],
+      "sources": [{ "path": "lib/intelligence/service.ts", "line": 31, "label": "brief generation" }]
+    },
+    {
+      "id": "integrations",
+      "type": "external",
+      "label": "Integrations",
+      "sublabel": "Sheets · signed webhooks",
+      "pos": [720, 460],
+      "size": [150, 64],
+      "sources": [{ "path": "lib/integrations/webhook-sign.ts", "line": 3, "label": "signed delivery" }]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "User surfaces",
+      "wraps": ["coach-workspace", "public-form"]
+    },
+    {
+      "kind": "region",
+      "label": "Vercel application",
+      "wraps": ["vercel-next", "better-auth", "validation", "agent-changeset", "human-approval", "form-draft", "form-version", "review-flags", "coach-brief"]
+    },
+    {
+      "kind": "region",
+      "label": "Data",
+      "wraps": ["neon-postgres"]
+    },
+    {
+      "kind": "region",
+      "label": "External AI",
+      "wraps": ["deepseek"]
+    },
+    {
+      "kind": "region",
+      "label": "Integrations",
+      "wraps": ["integrations"]
+    },
+    {
+      "kind": "security-group",
+      "label": "human Apply gate",
+      "wraps": ["human-approval"]
+    }
+  ],
+  "connections": [
+    { "id": "ops-out", "from": "deepseek", "to": "validation", "label": "operations", "variant": "emphasis" },
+    { "id": "ops-valid", "from": "validation", "to": "agent-changeset", "label": "validated ops", "variant": "emphasis" },
+    { "id": "cs-gate", "from": "agent-changeset", "to": "human-approval", "label": "not applied", "variant": "security" },
+    { "id": "coach-apply", "from": "coach-workspace", "to": "human-approval", "label": "Apply or Reject", "variant": "security", "fromSide": "top", "toSide": "bottom", "via": [[115, 168], [795, 168]], "labelAt": [400, 156] },
+    { "id": "apply-draft", "from": "human-approval", "to": "form-draft", "label": "mutates Draft", "variant": "emphasis" },
+    { "id": "publish", "from": "form-draft", "to": "form-version", "label": "publish", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "coach-session", "from": "coach-workspace", "to": "better-auth", "label": "authenticated session", "variant": "security", "labelDy": -33 },
+    { "id": "auth-runtime", "from": "better-auth", "to": "vercel-next", "variant": "security", "fromSide": "bottom", "toSide": "top" },
+    { "id": "public-api", "from": "public-form", "to": "vercel-next", "label": "public submit API", "variant": "emphasis", "fromSide": "top", "toSide": "top", "via": [[115, 276], [340, 276]], "labelAt": [220, 278] },
+    { "id": "canonical", "from": "vercel-next", "to": "neon-postgres", "label": "canonical submission", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "flags-from-db", "from": "neon-postgres", "to": "review-flags", "fromSide": "right", "toSide": "left", "via": [[455, 492], [455, 292]] },
+    { "id": "brief-from-db", "from": "neon-postgres", "to": "coach-brief", "fromSide": "right", "toSide": "left", "via": [[475, 492], [475, 392]] },
+    { "id": "brief-llm", "from": "coach-brief", "to": "deepseek", "label": "AI brief generation", "variant": "dashed", "fromSide": "right", "toSide": "top", "via": [[1110, 392], [1110, 12], [115, 12]], "labelAt": [500, 2] },
+    { "id": "deliver", "from": "vercel-next", "to": "integrations", "label": "signed delivery", "variant": "dashed", "fromSide": "left", "toSide": "bottom", "via": [[215, 322], [215, 610], [795, 610]], "labelAt": [500, 624] }
+  ]
+}
