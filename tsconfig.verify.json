@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": []
+  },
+  "exclude": ["node_modules", ".next"]
+}

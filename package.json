@@ -2,25 +2,60 @@
   "name": "onboarding",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "seed:v1-form": "tsx scripts/seed-v1-form.ts",
+    "import:v1-submissions": "tsx scripts/import-v1-submissions.ts",
+    "backfill:review-flags": "tsx scripts/backfill-review-flags.ts",
+    "test:agent-live": "tsx scripts/test-agent-live.ts",
+    "test:agent-edits-live": "tsx scripts/test-agent-edits-live.ts",
+    "test:coach-brief-live": "tsx scripts/test-coach-brief-live.ts",
+    "test:google-destination-live": "tsx scripts/test-google-destination-live.ts",
+    "test:webhook-live": "tsx scripts/test-webhook-live.ts"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.7.5",
+    "@google/genai": "^2.23.0",
+    "@neondatabase/serverless": "^1.1.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "better-auth": "^1.7.5",
+    "drizzle-orm": "^0.45.2",
+    "googleapis": "^181.0.0",
     "next": "16.3.5",
+    "openai": "^7.20.0",
+    "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.5.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "jsdom": "^30.1.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^3.2.4"
   }
 }

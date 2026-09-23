@@ -1,0 +1,847 @@
+import {
+  ACTIVITY_LEVELS,
+  ALCOHOL_FREQUENCY,
+  AVERAGE_STEPS,
+  DIETARY_RESTRICTIONS,
+  EATING_STRUCTURE,
+  EQUIPMENT,
+  FEEDBACK_PREFERENCE,
+  LABELS,
+  PREGNANCY,
+  PROGRESS_METHODS,
+  SECONDARY_GOALS,
+  SESSION_DURATION,
+  SEX_OPTIONS,
+  SLEEP_DURATION,
+  TAKEOUT_FREQUENCY,
+  TRAINING_DAYS_AVAILABLE,
+  TRAINING_EXPERIENCE,
+  TRAINING_LOCATION,
+  WEEKDAYS,
+  WORK_SCHEDULE,
+  YES_NO,
+  YES_NO_PRIVATE,
+  YES_NO_UNSURE,
+} from "../constants";
+import type { FieldOption, FormField, FormSection, OnboardingSchema } from "../schema/types";
+
+type DraftField = FormField extends infer T ? (T extends FormField ? Omit<T, "position"> : never) : never;
+
+function labeled(values: readonly string[]): FieldOption[] {
+  return values.map((value) => ({ value, label: LABELS[value] ?? value }));
+}
+
+function showEquals(fieldKey: string, value: unknown) {
+  return { action: "show" as const, all: [{ fieldKey, operator: "equals" as const, value }] };
+}
+
+function showAny(fieldKey: string, values: unknown[]) {
+  return {
+    action: "show" as const,
+    any: values.map((value) => ({ fieldKey, operator: "equals" as const, value })),
+  };
+}
+
+function showContains(fieldKey: string, value: unknown) {
+  return { action: "show" as const, all: [{ fieldKey, operator: "contains" as const, value }] };
+}
+
+function positioned(fields: DraftField[]): FormField[] {
+  return fields.map((field, position) => ({ ...field, position }) as FormField);
+}
+
+function section(
+  id: string,
+  key: string,
+  title: string,
+  fields: DraftField[],
+  extra: Partial<Pick<FormSection, "description" | "navLabel" | "footer">> = {},
+): Omit<FormSection, "position"> {
+  return { id, key, title, fields: positioned(fields), ...extra };
+}
+
+const about = section("sec_about", "about", "About you", [
+  {
+    id: "fld_full_name",
+    key: "full_name",
+    type: "short_text",
+    label: "Full name",
+    required: true,
+    autoComplete: "name",
+    validation: { requiredMessage: "Enter your full name." },
+  },
+  {
+    id: "fld_email",
+    key: "email",
+    type: "email",
+    label: "Email",
+    required: true,
+    validation: { email: true, requiredMessage: "Enter your email." },
+  },
+  {
+    id: "fld_phone",
+    key: "phone",
+    type: "phone",
+    label: "Phone / WhatsApp",
+    required: true,
+    validation: { requiredMessage: "Enter your phone or WhatsApp number." },
+  },
+  {
+    id: "fld_date_of_birth",
+    key: "date_of_birth",
+    type: "date",
+    label: "Date of birth",
+    required: true,
+    validation: { date: "past", requiredMessage: "Enter your date of birth." },
+  },
+  {
+    id: "fld_sex",
+    key: "sex",
+    type: "single_select",
+    label: "Sex",
+    required: true,
+    options: labeled(SEX_OPTIONS),
+  },
+  {
+    id: "fld_height_value",
+    key: "height_value",
+    type: "unit_number",
+    label: "Height",
+    required: true,
+    unitKey: "height_unit",
+    companionKey: "height_inches",
+    defaultUnit: "cm",
+    units: [
+      { value: "cm", label: "cm", min: 100, max: 250 },
+      { value: "ft_in", label: "ft / in", min: 3, max: 8, companion: { min: 0, max: 11.9 } },
+    ],
+  },
+  {
+    id: "fld_weight_value",
+    key: "weight_value",
+    type: "unit_number",
+    label: "Current bodyweight",
+    required: true,
+    unitKey: "weight_unit",
+    defaultUnit: "lb",
+    units: [
+      { value: "lb", label: "lb", min: 70, max: 500 },
+      { value: "kg", label: "kg", min: 30, max: 230 },
+    ],
+  },
+  { id: "fld_occupation", key: "occupation", type: "short_text", label: "Occupation", required: false },
+  {
+    id: "fld_activity_level",
+    key: "activity_level",
+    type: "single_select",
+    label: "Normal workday activity",
+    required: true,
+    options: labeled(ACTIVITY_LEVELS),
+  },
+  {
+    id: "fld_average_steps",
+    key: "average_steps",
+    type: "single_select",
+    label: "Approximate daily steps",
+    required: true,
+    columns: 2,
+    options: labeled(AVERAGE_STEPS),
+  },
+]);
+
+const health = section(
+  "sec_health",
+  "health",
+  "Health",
+  [
+    {
+      id: "fld_current_injuries",
+      key: "current_injuries",
+      type: "single_select",
+      label: "Current injuries, pain or physical limitations?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+    {
+      id: "fld_current_injury_details",
+      key: "current_injury_details",
+      type: "long_text",
+      label: "What are you experiencing?",
+      description: "Include anything that makes it better or worse.",
+      required: true,
+      logic: showEquals("current_injuries", "yes"),
+    },
+    {
+      id: "fld_previous_injuries",
+      key: "previous_injuries",
+      type: "single_select",
+      label: "Significant previous injuries?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+    {
+      id: "fld_previous_injury_details",
+      key: "previous_injury_details",
+      type: "long_text",
+      label: "Tell me about those injuries",
+      required: true,
+      logic: showEquals("previous_injuries", "yes"),
+    },
+    {
+      id: "fld_surgeries",
+      key: "surgeries",
+      type: "single_select",
+      label: "Significant surgeries?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+    {
+      id: "fld_surgery_details",
+      key: "surgery_details",
+      type: "long_text",
+      label: "Tell me about those surgeries",
+      required: true,
+      logic: showEquals("surgeries", "yes"),
+    },
+    {
+      id: "fld_exercise_restrictions",
+      key: "exercise_restrictions",
+      type: "single_select",
+      label: "Has a doctor or healthcare professional ever told you to limit or modify exercise?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+    {
+      id: "fld_exercise_restriction_details",
+      key: "exercise_restriction_details",
+      type: "long_text",
+      label: "What did they advise?",
+      required: true,
+      logic: showEquals("exercise_restrictions", "yes"),
+    },
+    {
+      id: "fld_medical_conditions",
+      key: "medical_conditions",
+      type: "single_select",
+      label: "Medical conditions that could affect exercise or nutrition?",
+      required: true,
+      options: labeled(YES_NO_UNSURE),
+    },
+    {
+      id: "fld_medical_condition_details",
+      key: "medical_condition_details",
+      type: "long_text",
+      label: "Share what you know",
+      required: true,
+      logic: showAny("medical_conditions", ["yes", "unsure"]),
+    },
+    {
+      id: "fld_medications",
+      key: "medications",
+      type: "single_select",
+      label:
+        "Medications that may affect exercise, appetite, heart rate, blood pressure, recovery or bodyweight?",
+      required: true,
+      options: labeled(YES_NO_PRIVATE),
+    },
+    {
+      id: "fld_medication_details",
+      key: "medication_details",
+      type: "long_text",
+      label: "Optional details",
+      required: false,
+      logic: showEquals("medications", "yes"),
+    },
+    {
+      id: "fld_pregnancy_considerations",
+      key: "pregnancy_considerations",
+      type: "single_select",
+      label:
+        "Are you currently pregnant, recently postpartum, or aware of any pregnancy-related considerations that may affect training?",
+      required: true,
+      options: labeled(PREGNANCY),
+    },
+    {
+      id: "fld_health_additional_notes",
+      key: "health_additional_notes",
+      type: "long_text",
+      label: "Anything else about your health I should know before creating your program?",
+      required: false,
+    },
+    {
+      id: "fld_health_acknowledgement",
+      key: "health_acknowledgement",
+      type: "acknowledgement",
+      label: "Health acknowledgement",
+      statement:
+        "I understand that I should consult an appropriate healthcare professional if I have concerns about whether exercise is appropriate for me.",
+      required: true,
+      validation: { requiredMessage: "Confirm this before continuing." },
+    },
+  ],
+  {
+    description:
+      "This helps me make better training decisions. Please answer honestly. If you're unsure about anything, we can discuss it privately.",
+  },
+);
+
+const training = section("sec_training", "training", "Training", [
+  {
+    id: "fld_training_experience",
+    key: "training_experience",
+    type: "single_select",
+    label: "How long have you been strength training consistently?",
+    required: true,
+    options: labeled(TRAINING_EXPERIENCE),
+  },
+  {
+    id: "fld_current_training_days",
+    key: "current_training_days",
+    type: "number",
+    label: "How many days per week are you currently training?",
+    placeholder: "0–7",
+    required: true,
+    validation: { min: 0, max: 7, integer: true },
+  },
+  {
+    id: "fld_current_training_description",
+    key: "current_training_description",
+    type: "long_text",
+    label: "What does your current training normally look like?",
+    description: "You can describe your usual workouts, split, classes, cardio, etc.",
+    required: true,
+  },
+  {
+    id: "fld_structured_program_experience",
+    key: "structured_program_experience",
+    type: "single_select",
+    label: "Have you followed a structured workout program before?",
+    required: true,
+    columns: 2,
+    options: labeled(YES_NO),
+  },
+  {
+    id: "fld_confident_exercises",
+    key: "confident_exercises",
+    type: "long_text",
+    label: "Which exercises do you feel confident performing?",
+    required: true,
+  },
+  {
+    id: "fld_uncertain_exercises",
+    key: "uncertain_exercises",
+    type: "long_text",
+    label: "Which exercises do you struggle with or feel unsure about?",
+    required: true,
+  },
+  {
+    id: "fld_disliked_exercises",
+    key: "disliked_exercises",
+    type: "long_text",
+    label: "Exercises you dislike or prefer not to do?",
+    required: false,
+  },
+  {
+    id: "fld_preferred_exercises",
+    key: "preferred_exercises",
+    type: "long_text",
+    label: "Exercises you really enjoy?",
+    required: false,
+  },
+]);
+
+const schedule = section("sec_schedule", "schedule", "Schedule", [
+  {
+    id: "fld_training_days_available",
+    key: "training_days_available",
+    type: "single_select",
+    label: "How many days per week can you realistically train?",
+    description: "Be honest about a week you can repeat, not a perfect week.",
+    required: true,
+    columns: 2,
+    options: labeled(TRAINING_DAYS_AVAILABLE),
+  },
+  {
+    id: "fld_available_days",
+    key: "available_days",
+    type: "multi_select",
+    label: "Which days are usually available?",
+    required: true,
+    options: labeled(WEEKDAYS),
+    validation: { minItems: 1, requiredMessage: "Select at least one day." },
+  },
+  {
+    id: "fld_session_duration",
+    key: "session_duration",
+    type: "single_select",
+    label: "Realistic workout duration?",
+    required: true,
+    options: labeled(SESSION_DURATION),
+  },
+  {
+    id: "fld_training_location",
+    key: "training_location",
+    type: "single_select",
+    label: "Where will you normally train?",
+    required: true,
+    options: labeled(TRAINING_LOCATION),
+  },
+  { id: "fld_gym_name", key: "gym_name", type: "short_text", label: "What gym do you use?", required: false },
+  {
+    id: "fld_equipment_access",
+    key: "equipment_access",
+    type: "multi_select",
+    label: "Equipment access",
+    required: true,
+    options: labeled(EQUIPMENT),
+    validation: { minItems: 1, requiredMessage: "Select everything you can access, or choose unsure." },
+  },
+  {
+    id: "fld_in_person_location_preference",
+    key: "in_person_location_preference",
+    type: "short_text",
+    label: "Where would you prefer our in-person sessions to take place?",
+    description: "Skip this if we are training fully remotely.",
+    required: false,
+  },
+]);
+
+const goals = section("sec_goals", "goals", "Goals", [
+  {
+    id: "fld_primary_goal",
+    key: "primary_goal",
+    type: "long_text",
+    label: "What is your #1 fitness priority right now?",
+    required: true,
+  },
+  {
+    id: "fld_secondary_goals",
+    key: "secondary_goals",
+    type: "multi_select",
+    label: "What other results would you like to work toward?",
+    required: false,
+    options: labeled(SECONDARY_GOALS),
+    validation: { minItems: 0 },
+  },
+  {
+    id: "fld_goal_changes",
+    key: "goal_changes",
+    type: "single_select",
+    label: "Has anything about your goals changed since we last spoke?",
+    required: true,
+    columns: 2,
+    options: labeled(YES_NO),
+  },
+  {
+    id: "fld_goal_change_details",
+    key: "goal_change_details",
+    type: "long_text",
+    label: "What changed?",
+    required: true,
+    logic: showEquals("goal_changes", "yes"),
+  },
+]);
+
+const nutrition = section(
+  "sec_nutrition",
+  "nutrition",
+  "Nutrition",
+  [
+    {
+      id: "fld_current_eating",
+      key: "current_eating",
+      type: "single_select",
+      label: "Current eating structure",
+      required: true,
+      options: labeled(EATING_STRUCTURE),
+    },
+    {
+      id: "fld_meals_per_day",
+      key: "meals_per_day",
+      type: "number",
+      label: "Meals per day",
+      required: true,
+      validation: { min: 1, max: 10 },
+    },
+    {
+      id: "fld_typical_breakfast",
+      key: "typical_breakfast",
+      type: "long_text",
+      label: "Breakfast",
+      required: true,
+      group: "typical_day",
+      groupTitle: "A normal day of eating",
+    },
+    {
+      id: "fld_typical_lunch",
+      key: "typical_lunch",
+      type: "long_text",
+      label: "Lunch",
+      required: true,
+      group: "typical_day",
+    },
+    {
+      id: "fld_typical_dinner",
+      key: "typical_dinner",
+      type: "long_text",
+      label: "Dinner",
+      required: true,
+      group: "typical_day",
+    },
+    {
+      id: "fld_typical_snacks",
+      key: "typical_snacks",
+      type: "long_text",
+      label: "Snacks",
+      required: false,
+      group: "typical_day",
+    },
+    {
+      id: "fld_typical_drinks",
+      key: "typical_drinks",
+      type: "long_text",
+      label: "Drinks",
+      required: false,
+      group: "typical_day",
+    },
+    {
+      id: "fld_calorie_tracking",
+      key: "calorie_tracking",
+      type: "single_select",
+      label: "Currently tracking calories or macros?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+    {
+      id: "fld_current_calories",
+      key: "current_calories",
+      type: "short_text",
+      label: "Calories",
+      required: false,
+      group: "macros",
+      logic: showEquals("calorie_tracking", "yes"),
+    },
+    {
+      id: "fld_current_protein",
+      key: "current_protein",
+      type: "short_text",
+      label: "Protein",
+      required: false,
+      group: "macros",
+      logic: showEquals("calorie_tracking", "yes"),
+    },
+    {
+      id: "fld_current_carbs",
+      key: "current_carbs",
+      type: "short_text",
+      label: "Carbohydrates",
+      required: false,
+      group: "macros",
+      logic: showEquals("calorie_tracking", "yes"),
+    },
+    {
+      id: "fld_current_fat",
+      key: "current_fat",
+      type: "short_text",
+      label: "Fat",
+      required: false,
+      group: "macros",
+      logic: showEquals("calorie_tracking", "yes"),
+    },
+    {
+      id: "fld_food_allergies",
+      key: "food_allergies",
+      type: "single_select",
+      label: "Food allergies or intolerances?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+    {
+      id: "fld_food_allergy_details",
+      key: "food_allergy_details",
+      type: "long_text",
+      label: "Which foods?",
+      required: true,
+      logic: showEquals("food_allergies", "yes"),
+    },
+    {
+      id: "fld_dietary_restrictions",
+      key: "dietary_restrictions",
+      type: "multi_select",
+      label: "Dietary restrictions / eating style",
+      required: true,
+      options: labeled(DIETARY_RESTRICTIONS),
+      validation: { minItems: 1, requiredMessage: "Select none if this does not apply." },
+    },
+    {
+      id: "fld_dietary_restriction_details",
+      key: "dietary_restriction_details",
+      type: "short_text",
+      label: "Other restriction details",
+      required: false,
+      logic: showContains("dietary_restrictions", "other"),
+    },
+    {
+      id: "fld_preferred_foods",
+      key: "preferred_foods",
+      type: "long_text",
+      label: "Foods you really enjoy",
+      required: true,
+    },
+    {
+      id: "fld_disliked_foods",
+      key: "disliked_foods",
+      type: "long_text",
+      label: "Foods you dislike or won't eat",
+      required: true,
+    },
+    {
+      id: "fld_takeout_frequency",
+      key: "takeout_frequency",
+      type: "single_select",
+      label: "Restaurant / takeout frequency",
+      required: true,
+      options: labeled(TAKEOUT_FREQUENCY),
+    },
+    {
+      id: "fld_water_intake",
+      key: "water_intake",
+      type: "short_text",
+      label: "Approximate water intake",
+      required: true,
+    },
+    {
+      id: "fld_alcohol_frequency",
+      key: "alcohol_frequency",
+      type: "single_select",
+      label: "Alcohol frequency",
+      required: true,
+      options: labeled(ALCOHOL_FREQUENCY),
+    },
+    {
+      id: "fld_weight_change_history",
+      key: "weight_change_history",
+      type: "single_select",
+      label: "Have you intentionally tried to lose or gain weight before?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+    {
+      id: "fld_weight_change_details",
+      key: "weight_change_details",
+      type: "long_text",
+      label: "What did you try, and how did it go?",
+      required: true,
+      logic: showEquals("weight_change_history", "yes"),
+    },
+  ],
+  {
+    description:
+      "I'm not looking for perfect eating. I just need an honest picture of what your nutrition currently looks like.",
+  },
+);
+
+const lifestyle = section("sec_lifestyle", "lifestyle", "Lifestyle", [
+  {
+    id: "fld_sleep_duration",
+    key: "sleep_duration",
+    type: "single_select",
+    label: "Typical sleep",
+    required: true,
+    options: labeled(SLEEP_DURATION),
+  },
+  {
+    id: "fld_sleep_quality",
+    key: "sleep_quality",
+    type: "scale",
+    label: "Sleep quality",
+    required: true,
+    min: 1,
+    max: 5,
+    lowLabel: "Poor",
+    highLabel: "Excellent",
+  },
+  {
+    id: "fld_stress_level",
+    key: "stress_level",
+    type: "scale",
+    label: "Current stress",
+    required: true,
+    min: 1,
+    max: 5,
+    lowLabel: "Very low",
+    highLabel: "Very high",
+  },
+  {
+    id: "fld_stress_sources",
+    key: "stress_sources",
+    type: "long_text",
+    label: "Biggest sources of stress",
+    required: false,
+  },
+  {
+    id: "fld_work_schedule",
+    key: "work_schedule",
+    type: "single_select",
+    label: "Work schedule",
+    required: true,
+    options: labeled(WORK_SCHEDULE),
+  },
+  {
+    id: "fld_work_schedule_details",
+    key: "work_schedule_details",
+    type: "short_text",
+    label: "Describe your schedule",
+    required: false,
+    logic: showEquals("work_schedule", "other"),
+  },
+  {
+    id: "fld_schedule_challenges",
+    key: "schedule_challenges",
+    type: "long_text",
+    label: "Anything about your schedule that could make training consistency difficult?",
+    required: false,
+  },
+]);
+
+const progress = section(
+  "sec_progress",
+  "progress",
+  "How are you comfortable tracking progress?",
+  [
+    {
+      id: "fld_progress_methods",
+      key: "progress_methods",
+      type: "multi_select",
+      label: "Select every method you are comfortable with",
+      required: true,
+      options: labeled(PROGRESS_METHODS),
+      validation: { minItems: 1, requiredMessage: "Select at least one way to track progress." },
+    },
+    {
+      id: "fld_progress_photos",
+      key: "progress_photos",
+      type: "single_select",
+      label: "Are you comfortable submitting private progress photos for coaching purposes?",
+      required: true,
+      columns: 2,
+      options: labeled(YES_NO),
+    },
+  ],
+  {
+    navLabel: "Progress",
+    description:
+      "We don't have to rely on one number. We can use different markers to see what's actually improving.",
+    footer:
+      "Progress photos are private coaching information and will not be posted or used for marketing without separate permission.",
+  },
+);
+
+const coaching = section(
+  "sec_coaching",
+  "coaching",
+  "How can I coach you best?",
+  [
+    {
+      id: "fld_feedback_preference",
+      key: "feedback_preference",
+      type: "multi_select",
+      label: "Preferred feedback",
+      required: true,
+      options: labeled(FEEDBACK_PREFERENCE),
+      validation: { minItems: 1, requiredMessage: "Select at least one preference." },
+    },
+    {
+      id: "fld_consistency_challenges",
+      key: "consistency_challenges",
+      type: "long_text",
+      label: "When you're struggling with consistency, what usually helps you get back on track?",
+      required: true,
+    },
+    {
+      id: "fld_fall_off_causes",
+      key: "fall_off_causes",
+      type: "long_text",
+      label: "What usually causes you to fall off track?",
+      required: true,
+    },
+    {
+      id: "fld_coaching_dislikes",
+      key: "coaching_dislikes",
+      type: "long_text",
+      label: "Is there anything you DON'T want from a coach?",
+      required: false,
+    },
+    {
+      id: "fld_coaching_concerns",
+      key: "coaching_concerns",
+      type: "long_text",
+      label: "What's the biggest thing you're nervous or uncertain about as we start coaching?",
+      required: true,
+    },
+  ],
+  { navLabel: "Coaching" },
+);
+
+const finalCheck = section(
+  "sec_final",
+  "final",
+  "Almost done.",
+  [
+    {
+      id: "fld_additional_notes",
+      key: "additional_notes",
+      type: "long_text",
+      label: "Is there anything else you want me to know before I build your program?",
+      required: false,
+    },
+    {
+      id: "fld_accuracy_acknowledgement",
+      key: "accuracy_acknowledgement",
+      type: "acknowledgement",
+      label: "Accuracy confirmation",
+      statement: "I confirm that the information I've provided is accurate to the best of my knowledge.",
+      required: true,
+      validation: { requiredMessage: "Confirm this before submitting." },
+    },
+  ],
+  { navLabel: "Final check" },
+);
+
+const draftSections = [about, health, training, schedule, goals, nutrition, lifestyle, progress, coaching, finalCheck];
+
+export const emmanuelOnboardingV1: OnboardingSchema = {
+  id: "schema_emmanuel_onboarding_v1",
+  schemaVersion: "onboarding_v1",
+  title: "Emmanuel Coaching onboarding",
+  brandName: "Emmanuel Coaching",
+  estimatedMinutes: { min: 8, max: 12 },
+  storageKey: "emmanuel_onboarding_v1",
+  intro: {
+    title: "Welcome to Coaching",
+    navLabel: "Welcome",
+    description: [
+      "You're officially in. Before I build your training and nutrition plan, I need to learn a little more about your body, routine, training environment and lifestyle.",
+      "Your answers will help me build your coaching around you rather than giving you a generic program.",
+    ],
+    footnote: "Take your time and answer as accurately as you can. There are no perfect answers.",
+    buttonLabel: "Start Onboarding",
+  },
+  sections: draftSections.map((item, position) => ({ ...item, position })),
+  success: {
+    title: "You're all set",
+    message: [
+      "I've received your onboarding information. I'll review everything and use it to prepare your initial training and nutrition setup.",
+      "From here, we'll go through your starting plan together and make sure you know exactly what we're doing and why.",
+    ],
+    closing: "Welcome to coaching.",
+    aside: "No more forms from here. I'll take it from the answers you just sent.",
+  },
+};

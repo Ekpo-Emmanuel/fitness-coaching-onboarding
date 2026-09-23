@@ -1,0 +1,7 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Brand } from "./Brand";
+
+export function AuthLayout({ mode, children }: { mode: "signin" | "signup"; children: ReactNode }) {
+  return <main className="auth-layout"><section className="auth-story"><Link href="/" aria-label="Coaching home"><Brand /></Link><div><p className="eyebrow">A better beginning</p><h2>Great coaching<br />starts with<br /><em>understanding.</em></h2><p>Give every client a thoughtful start. Build your onboarding, gather their story, and arrive prepared.</p><ol><li><span>01</span>Build with your Agent</li><li><span>02</span>Make it your own</li><li><span>03</span>Get to know your client</li></ol></div><small>Made for the way you coach.</small></section><section className="auth-form-panel"><Link className="auth-back" href="/">← Back to Coaching</Link><div><p className="eyebrow">Your coaching workspace</p><h1>{mode === "signin" ? "Welcome back." : "Start with a better hello."}</h1><p className="page-description">{mode === "signin" ? "Sign in to pick up where you left off." : "Create your account. Then tell us how you coach."}</p>{children}<p className="auth-switch">{mode === "signin" ? "New to Coaching?" : "Already have an account?"} <Link href={mode === "signin" ? "/signup" : "/login"}>{mode === "signin" ? "Create an account" : "Sign in"}</Link></p></div><small>Thoughtful onboarding. Human-led coaching.</small></section></main>;
+}

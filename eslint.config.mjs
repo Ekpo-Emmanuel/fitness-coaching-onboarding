@@ -7,12 +7,22 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "drizzle/**",
+    "playwright-report/**",
+    "test-results/**",
+    "artifacts/**",
+    "node_modules/**",
   ]),
+  {
+    files: ["app/onboarding/OnboardingRenderer.tsx"],
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
